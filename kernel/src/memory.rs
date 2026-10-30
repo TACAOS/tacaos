@@ -1,22 +1,10 @@
 //! Physical frame allocation.
 
-/// A physical memory region supplied by the boot environment.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct MemoryRegion {
-    /// Inclusive start address of the region.
-    pub start: u64,
-    /// Length of the region in bytes.
-    pub length: u64,
-    /// Whether the region may be used for general allocations.
-    pub kind: MemoryRegionKind,
-}
+use crate::sync::{OnceCell, SpinLock};
+pub use boot_protocol::{MemoryRegion, MemoryRegionKind};
 
-/// The allocation policy for a physical memory region.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum MemoryRegionKind {
-    Usable,
-    Reserved,
-}
+static FRAME_ALLOCATOR: OnceCell<Result<SpinLock<FrameAllocator<'static>>, FrameAllocatorError>> =
+    OnceCell::new();
 
 /// A physical page-sized frame.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -110,6 +98,33 @@ impl<'a> FrameAllocator<'a> {
 
         None
     }
+}
+
+/// Initializes the global physical frame allocator once from the boot memory map.
+pub fn initialize(
+    regions: &'static [MemoryRegion],
+    page_size: u64,
+) -> Result<(), FrameAllocatorError> {
+    match FRAME_ALLOCATOR.get_or_init(|| FrameAllocator::new(regions, page_size).map(SpinLock::new))
+    {
+        Ok(_) => Ok(()),
+        Err(error) => Err(*error),
+    }
+}
+
+/// Allocates one frame from the initialized global allocator.
+pub fn allocate_frame() -> Option<PhysFrame> {
+    FRAME_ALLOCATOR.get()?.as_ref().ok()?.lock().allocate()
+}
+
+/// Allocates a contiguous run of frames from the initialized global allocator.
+pub fn allocate_contiguous(frame_count: u64) -> Option<PhysFrame> {
+    FRAME_ALLOCATOR
+        .get()?
+        .as_ref()
+        .ok()?
+        .lock()
+        .allocate_contiguous(frame_count)
 }
 
 fn align_up(address: u64, alignment: u64) -> Option<u64> {

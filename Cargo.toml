@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
   # Core components 
+  "boot-protocol",
   "bootloader", 
   "kernel", 
   # Services

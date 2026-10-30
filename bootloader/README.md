@@ -10,11 +10,11 @@ The project plans to support these architecture targets:
 
 UEFI is the initial firmware target. Legacy BIOS support is planned for a later stage.
 On x86_64 UEFI, the bootloader reads `/kernel.elf`, validates its ELF64 load segments, allocates the segments at their linked physical addresses, and creates a 64 KiB stack.
-It then exits UEFI boot services and transfers control to the ELF entry point.
-The current handoff passes no boot information, and the kernel relies on the inherited UEFI identity mappings.
+It normalizes the UEFI memory map into the shared boot protocol, exits boot services, and passes `BootInfo` in the kernel's first argument register.
+The kernel currently relies on the inherited UEFI identity mappings.
 Other architectures currently report that their boot flow is not implemented.
 
-The x86_64 loader accepts static little-endian ELF64 executables for the AMD64 machine type, with at most 16 load segments and a maximum image size of 64 MiB.
+The x86_64 loader accepts static little-endian ELF64 executables for the AMD64 machine type, with at most 16 load segments, 2048 memory regions, and a maximum image size of 64 MiB.
 The kernel is linked at physical and virtual address `0x100000`, and the bootloader requires page-aligned, non-overlapping load segments.
 Copy the kernel ELF to `/kernel.elf` at the root of the boot volume.
 

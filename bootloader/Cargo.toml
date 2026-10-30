@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+boot-protocol = { path = "../boot-protocol" }
 uefi = { version = "0.34", features = ["alloc", "global_allocator", "panic_handler"] }
 
 [[bin]]

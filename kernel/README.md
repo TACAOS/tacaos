@@ -6,7 +6,7 @@ It then disables interrupts and halts. Panics are also reported over COM1 before
 
 The architecture-independent `memory` module provides sequential and contiguous physical-frame allocation.
 It accepts sorted, non-overlapping memory regions and a page size, so it can be reused with different architecture memory maps and page granules.
-It does not yet free frames or consume a bootloader memory map.
+The bootloader supplies the memory map through `BootInfo`, but frames are not yet freed.
 
 The architecture-independent `sync` module provides a non-poisoning spin lock and a thread-safe `OnceCell`, both built on Rust atomics.
 It is not safe to acquire from an interrupt handler that may interrupt code holding the same lock.
@@ -21,5 +21,5 @@ cargo build --target x86_64-unknown-none
 The resulting ELF is `../target/x86_64-unknown-none/debug/kernel`.
 Copy this file to `/kernel.elf` at the root of the UEFI boot volume.
 The x86_64 UEFI bootloader loads the ELF segments and transfers control to `_start`.
-The bootloader currently passes no memory map or boot information to the kernel.
-
+The shared `boot-protocol` crate defines the versioned `BootInfo` structure and normalized memory region types.
+The kernel validates the passed memory map and initializes its global physical frame allocator from it.
