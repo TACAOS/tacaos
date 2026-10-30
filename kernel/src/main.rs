@@ -2,6 +2,7 @@
 #![cfg_attr(target_os = "none", no_main)]
 
 pub mod memory;
+pub mod sync;
 
 #[cfg(all(target_os = "none", target_arch = "x86_64"))]
 mod arch;

@@ -35,7 +35,7 @@ pub enum FrameAllocatorError {
 
 /// Sequentially allocates physical frames from usable memory regions.
 ///
-/// Regions must be sorted by start address and must not overlap. 
+/// Regions must be sorted by start address and must not overlap.
 /// The allocator aligns region starts to `page_size` and never returns reserved memory.
 /// Frames are not freed; this allocator is intended as a simple early-boot allocator until a reclaiming allocator is added.
 pub struct FrameAllocator<'a> {

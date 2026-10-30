@@ -8,6 +8,9 @@ The architecture-independent `memory` module provides a sequential physical-fram
 It accepts sorted, non-overlapping memory regions and a page size, so it can be reused with different architecture memory maps and page granules.
 It does not yet free frames or consume a bootloader memory map.
 
+The architecture-independent `sync` module provides a non-poisoning spin lock built on Rust atomics.
+It is not safe to acquire from an interrupt handler that may interrupt code holding the same lock.
+
 Build it from this directory with:
 
 ```sh
