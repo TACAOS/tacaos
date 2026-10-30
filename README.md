@@ -2,7 +2,7 @@
 
 **Tsundere Architecture for Containers and Operating Systems** (real name)
 
-TACAIS is an experimental, server focused opearting system, written primarily in rust, with assembled used for the bootloader and other low level components.
+TACAOS is an experimental, server focused opearting system, written primarily in rust, with assembled used for the bootloader and other low level components.
 
 Its goal is to provide a highly minimal, efficient and secure environment for hosting OCI containers, with its own kernel, filesystem, bootloader and container runtime.
 
