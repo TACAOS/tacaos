@@ -74,6 +74,16 @@ impl<'a> FrameAllocator<'a> {
 
     /// Returns the next usable physical frame, or `None` when memory is exhausted.
     pub fn allocate(&mut self) -> Option<PhysFrame> {
+        self.allocate_contiguous(1)
+    }
+
+    /// Allocates a contiguous run of usable frames and returns its first frame.
+    pub fn allocate_contiguous(&mut self, frame_count: u64) -> Option<PhysFrame> {
+        let allocation_size = frame_count.checked_mul(self.page_size)?;
+        if frame_count == 0 {
+            return None;
+        }
+
         while let Some(region) = self.regions.get(self.region_index) {
             if region.kind != MemoryRegionKind::Usable {
                 self.region_index += 1;
@@ -87,9 +97,9 @@ impl<'a> FrameAllocator<'a> {
                 None => align_up(region.start, self.page_size)?,
             };
 
-            if let Some(frame_end) = candidate.checked_add(self.page_size) {
-                if frame_end <= region_end {
-                    self.next_address = Some(frame_end);
+            if let Some(allocation_end) = candidate.checked_add(allocation_size) {
+                if allocation_end <= region_end {
+                    self.next_address = Some(allocation_end);
                     return Some(PhysFrame { address: candidate });
                 }
             }
@@ -151,6 +161,21 @@ mod tests {
 
         assert_eq!(allocator.allocate(), Some(PhysFrame { address: 0 }));
         assert_eq!(allocator.allocate(), Some(PhysFrame { address: 16 * KIB }));
+        assert_eq!(allocator.allocate(), None);
+    }
+
+    #[test]
+    fn allocates_contiguous_runs_without_crossing_region_boundaries() {
+        let regions = [
+            region(0, 2 * 4096, MemoryRegionKind::Usable),
+            region(3 * 4096, 3 * 4096, MemoryRegionKind::Usable),
+        ];
+        let mut allocator = FrameAllocator::new(&regions, 4096).unwrap();
+
+        assert_eq!(
+            allocator.allocate_contiguous(3),
+            Some(PhysFrame { address: 3 * 4096 })
+        );
         assert_eq!(allocator.allocate(), None);
     }
 
