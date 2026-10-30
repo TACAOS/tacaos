@@ -3,4 +3,6 @@
 #[cfg(test)]
 extern crate std;
 
-pub mod elf;
+pub mod x86_64 {
+    pub mod elf;
+}

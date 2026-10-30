@@ -83,7 +83,7 @@ mod firmware {
             return Status::LOAD_ERROR;
         }
 
-        let elf = match bootloader::elf::ElfImage::parse(&kernel_bytes) {
+        let elf = match bootloader::x86_64::elf::ElfImage::parse(&kernel_bytes) {
             Ok(elf) => elf,
             Err(_) => {
                 uefi::println!("/kernel.elf is not a supported x86_64 ELF executable.");
