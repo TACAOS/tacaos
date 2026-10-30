@@ -23,14 +23,53 @@ mod firmware {
 
     #[entry]
     fn main() -> Status {
-        uefi::println!("TACAOS bootloader stub: {} UEFI", super::ARCHITECTURE);
-        uefi::println!("Machine initialization and kernel loading are not implemented yet.");
-        Status::UNSUPPORTED
+        uefi::println!("TACAOS bootloader: {} UEFI", super::ARCHITECTURE);
+
+        #[cfg(target_arch = "x86_64")]
+        {
+            return load_x86_64();
+        }
+
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            uefi::println!("Machine initialization and kernel loading are not implemented yet.");
+            Status::UNSUPPORTED
+        }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    fn load_x86_64() -> Status {
+        let image = uefi::boot::image_handle();
+        let Ok(protocol) = uefi::boot::get_image_file_system(image) else {
+            uefi::println!("Could not access the boot volume.");
+            return Status::NOT_FOUND;
+        };
+        let mut filesystem = uefi::fs::FileSystem::new(protocol);
+
+        match filesystem.try_exists(uefi::cstr16!("/kernel.elf")) {
+            Ok(true) => {
+                uefi::println!(
+                    "Found /kernel.elf. ELF loading and kernel handoff are not implemented."
+                );
+                Status::UNSUPPORTED
+            }
+            Ok(false) => {
+                uefi::println!("/kernel.elf was not found on the boot volume.");
+                Status::NOT_FOUND
+            }
+            Err(_) => {
+                uefi::println!("Could not inspect /kernel.elf on the boot volume.");
+                Status::LOAD_ERROR
+            }
+        }
     }
 }
 
 // only a placeholder
 #[cfg(not(target_os = "uefi"))]
 fn main() {
-    println!("TACAOS bootloader stub for {} (UEFI); no boot operations implemented.", ARCHITECTURE);
+    println!(
+        "TACAOS bootloader stub for {} (UEFI); no boot operations implemented.",
+        ARCHITECTURE
+    );
 }

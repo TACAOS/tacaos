@@ -9,8 +9,12 @@ The project plans to support these architecture targets:
 - AArch64
 
 UEFI is the initial firmware target. Legacy BIOS support is planned for a later stage.
-The current Rust crate is only a scaffold: it identifies the build architecture and has a UEFI entry point, but does not yet initialize hardware or load a kernel. 
-Architecture-specific initialization and handoff will be added as those stages are implemented.
+The current Rust crate is an early scaffold. On x86_64 UEFI, it checks the boot volume for `/kernel.elf`.
+It does not yet initialize hardware, load the ELF image, or hand off control to the kernel.
+Other architectures currently report that their boot flow is not implemented.
+
+The initial x86_64 kernel image convention is an ELF64 file named `/kernel.elf` at the root of the boot volume.
+ELF loading and the kernel handoff ABI still need to be implemented.
 
 For example, to build the current UEFI application for x86_64:
 
@@ -18,4 +22,3 @@ For example, to build the current UEFI application for x86_64:
 rustup target add x86_64-unknown-uefi
 cargo build -p bootloader --target x86_64-unknown-uefi
 ```
-
