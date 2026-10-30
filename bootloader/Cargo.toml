@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+uefi = { version = "0.34", features = ["alloc"] }
+
+[[bin]]
+name = "bootloader"
+path = "src/main.rs"
+test = false
+bench = false
