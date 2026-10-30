@@ -19,5 +19,7 @@ cargo build --target x86_64-unknown-none
 ```
 
 The resulting ELF is `../target/x86_64-unknown-none/debug/kernel`.
-The initial bootloader image convention expects this file to be copied to `/kernel.elf` on the boot volume. 
-The bootloader does not yet load ELF segments or transfer control to the kernel.
+Copy this file to `/kernel.elf` at the root of the UEFI boot volume.
+The x86_64 UEFI bootloader loads the ELF segments and transfers control to `_start`.
+The bootloader currently passes no memory map or boot information to the kernel.
+

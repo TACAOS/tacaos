@@ -11,6 +11,7 @@ fn main() {
             "cargo:rustc-link-arg-bin=kernel=-T{}",
             linker_script.display()
         );
+        println!("cargo:rustc-link-arg-bin=kernel=-no-pie");
         println!("cargo:rerun-if-changed={}", linker_script.display());
     }
 }
