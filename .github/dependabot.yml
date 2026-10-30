@@ -1,0 +1,41 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 20
+    groups:
+      all-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: cargo
+    directory: "/kernel"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 20
+    groups:
+      kernel-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: cargo
+    directory: "/bootloader"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 20
+    groups:
+      bootloader-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: cargo
+    directory: "/services"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 20
+    groups:
+      services-dependencies:
+        patterns:
+          - "*" 
