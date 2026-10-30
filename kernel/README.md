@@ -4,7 +4,9 @@ The x86_64 kernel is a freestanding ELF with an `_start` entry point.
 On startup it initializes COM1 and writes a message to the serial console.
 It then disables interrupts and halts. Panics are also reported over COM1 before halting.
 
-In QEMU, attach the serial console with `-serial stdio` to see the startup message.
+The architecture-independent `memory` module provides a sequential physical-frame allocator.
+It accepts sorted, non-overlapping memory regions and a page size, so it can be reused with different architecture memory maps and page granules.
+It does not yet free frames or consume a bootloader memory map.
 
 Build it from this directory with:
 
